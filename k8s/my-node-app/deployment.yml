@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-node-app
+  namespace: default
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: my-node-app
+  template:
+    metadata:
+      labels:
+        app: my-node-app
+    spec:
+      containers:
+      - image: my-node-app
+        name: api-node
+        imagePullPolicy: Never
+        ports:
+        - name: api-node-port
+          containerPort: 3000
+        env:
+        # - name: OTEL_LOG_LEVEL
+        #   value: DEBUG
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-python-app-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: my-python-app
+  ports:
+    - port: 3000
+      targetPort: api-python-port
