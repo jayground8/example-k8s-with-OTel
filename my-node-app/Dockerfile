@@ -1,8 +1,9 @@
 FROM node:20.10-alpine3.19 As build
 
 WORKDIR /usr/src/app
-COPY . .
+COPY package*.json ./
 RUN npm ci
+COPY . .
 RUN npm run build
 
 FROM node:20.10-alpine3.19

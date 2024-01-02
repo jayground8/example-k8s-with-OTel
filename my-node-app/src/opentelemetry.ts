@@ -1,3 +1,4 @@
+// sdk-node brings all trace, metrics, logs sdk
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
@@ -14,12 +15,7 @@ export const otelSDK = new NodeSDK({
     new HttpInstrumentation(),
     new ExpressInstrumentation(),
     new NestInstrumentation(),
-    new WinstonInstrumentation({
-      enabled: true,
-      logHook: (_span, record) => {
-        record['resource.service.name'] = 'test-service';
-      },
-    }),
+    new WinstonInstrumentation(),
   ],
 });
 
