@@ -76,7 +76,7 @@ config:
         receivers:
           - otlp
         exporters:
-          - debug
+          # - debug
           - otlp
       metrics:
         receivers:
@@ -106,7 +106,6 @@ config:
         insecure: true
     debug:
       verbosity: detailed
-
 ports:
   jaeger-compact:
     enabled: false

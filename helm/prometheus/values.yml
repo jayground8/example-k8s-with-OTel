@@ -1,0 +1,4 @@
+server:
+  extraFlags:
+  - enable-feature=otlp-write-receiver
+  - web.enable-lifecycle

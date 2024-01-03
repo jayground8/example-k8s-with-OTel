@@ -2,27 +2,73 @@ datasources:
   datasources.yaml:
     apiVersion: 1
     datasources:
-    - name: Loki
-      type: loki
-      access: proxy
-      url: http://loki:3100
-      basicAuth: false
-      jsonData:
-        maxLines: 1000
-        derivedFields:
-          - datasourceName: Tempo
-            datasourceUid: tempo
-            matcherRegex: trace_id=(\w+)
-            name: traceID
-            url: $${__value.raw}
-    - name: Tempo
-      type: tempo
-      access: proxy
-      orgId: 1
-      url: http://tempo:3100
-      basicAuth: false
-      isDefault: false
-      version: 1
-      editable: false
-      apiVersion: 1
-      uid: tempo
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        # Access mode - proxy (server in the UI) or direct (browser in the UI).
+        url: http://prometheus-server
+        jsonData:
+          httpMethod: POST
+          manageAlerts: true
+          prometheusType: Prometheus
+          prometheusVersion: 2.48.1
+          cacheLevel: "High"
+          disableRecordingRules: false
+          incrementalQueryOverlapWindow: 10m
+          exemplarTraceIdDestinations:
+            - name: TraceID
+              datasourceUid: tempo
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://loki:3100
+        basicAuth: false
+        jsonData:
+          maxLines: 1000
+          derivedFields:
+            - datasourceName: Tempo
+              datasourceUid: tempo
+              matcherRegex: trace_id=(\w+)
+              name: traceID
+              url: $${__value.raw}
+      - name: Tempo
+        type: tempo
+        access: proxy
+        orgId: 1
+        url: http://tempo:3100
+        basicAuth: false
+        isDefault: false
+        version: 1
+        editable: false
+        apiVersion: 1
+        uid: tempo
+        jsonData:
+          tracesToLogsV2:
+            datasourceUid: "Loki"
+            spanStartTimeShift: "1h"
+            spanEndTimeShift: "-1h"
+            tags: [{ key: "service.name", value: "container" }]
+            filterByTraceID: false
+            filterBySpanID: false
+            customQuery: true
+            query: '{$${__tags}} |="$${__span.traceId}"'
+          tracesToMetrics:
+            datasourceUid: "Prometheus"
+            spanStartTimeShift: "1h"
+            spanEndTimeShift: "-1h"
+            tags: [{ key: "service.name", value: "job" }]
+            queries:
+              - name: "Sample query"
+                query: "sum(rate(http_server_duration_milliseconds_bucket{$$__tags}[5m]))"
+          # serviceMap:
+          #   datasourceUid: "Prometheus"
+          nodeGraph:
+            enabled: true
+          search:
+            hide: false
+          lokiSearch:
+            datasourceUid: "Loki"
+          # traceQuery:
+          #   timeShiftEnabled: true
+          #   spanStartTimeShift: "1h"
+          #   spanEndTimeShift: "-1h"
