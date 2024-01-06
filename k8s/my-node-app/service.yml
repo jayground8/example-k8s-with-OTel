@@ -9,3 +9,17 @@ spec:
   ports:
     - port: 3000
       targetPort: api-node-port
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-node-app-headless-svc
+spec:
+  clusterIP: None
+  selector:
+    app: my-node-app
+  ports:
+    - port: 3000
+      targetPort: api-node-port

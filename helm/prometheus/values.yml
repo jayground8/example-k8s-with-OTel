@@ -2,3 +2,17 @@ server:
   extraFlags:
   - enable-feature=otlp-write-receiver
   - web.enable-lifecycle
+
+extraScrapeConfigs: |
+   - job_name: 'prometheus-nodejs-exporter'
+     metrics_path: /prometheus/metrics
+     dns_sd_configs:
+      - names:
+        - my-node-app-headless-svc
+     relabel_configs:
+       - source_labels: [__address__]
+         target_label: __param_target
+       - source_labels: [__param_target]
+         target_label: instance
+       - target_label: __address__
+         replacement: my-node-app-headless-svc:3000
